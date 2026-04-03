@@ -64,7 +64,7 @@ export function TradeRow({ trade }: { trade: TradeTableItem }) {
       <TableCell>
         {trade.ticker ? (
           <Link
-            href={`/stocks/${trade.ticker}`}
+            href={`/stocks/${encodeURIComponent(trade.ticker)}`}
             className="font-medium text-foreground underline-offset-4 hover:underline"
           >
             {trade.ticker}
