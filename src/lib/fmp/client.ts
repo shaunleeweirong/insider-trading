@@ -16,6 +16,48 @@ const FMP_BASE_URL = "https://financialmodelingprep.com";
 const MAX_RETRIES = 3;
 const BACKOFF_MS = [1000, 2000, 4000] as const;
 
+function normalizeSenateTradeRecord(record: unknown): unknown {
+  if (!record || typeof record !== "object") return record;
+
+  const item = record as Record<string, unknown>;
+
+  return {
+    ...item,
+    ticker:
+      typeof item.ticker === "string"
+        ? item.ticker
+        : typeof item.symbol === "string"
+          ? item.symbol
+          : null,
+  };
+}
+
+function normalizeHouseDisclosureRecord(record: unknown): unknown {
+  if (!record || typeof record !== "object") return record;
+
+  const item = record as Record<string, unknown>;
+  const representative = typeof item.representative === "string" ? item.representative.trim() : "";
+  const [derivedFirstName = "", ...rest] = representative.split(/\s+/).filter(Boolean);
+  const derivedLastName = rest.join(" ");
+  const firstName = typeof item.firstName === "string" ? item.firstName : derivedFirstName;
+  const lastName = typeof item.lastName === "string" ? item.lastName : derivedLastName;
+
+  return {
+    ...item,
+    firstName,
+    lastName,
+    office: representative || (typeof item.office === "string" ? item.office : ""),
+    ticker:
+      typeof item.ticker === "string"
+        ? item.ticker
+        : typeof item.symbol === "string"
+          ? item.symbol
+          : null,
+    assetType: typeof item.assetType === "string" ? item.assetType : null,
+    comment: typeof item.comment === "string" ? item.comment : null,
+  };
+}
+
 class NonRetryableError extends Error {
   constructor(message: string) {
     super(message);
@@ -76,12 +118,12 @@ function parseArray<T>(
 
 export async function fetchSenateTrades(page = 0): Promise<SenateTrade[]> {
   const apiKey = getServerEnv().FMP_API_KEY;
-  const url = `${FMP_BASE_URL}/stable/senate-trading?page=${page}&apikey=${apiKey}`;
+  const url = `${FMP_BASE_URL}/api/v4/senate-trading-rss-feed?page=${page}&apikey=${apiKey}`;
   const response = await fetchWithRetry(url);
   const data: unknown = await response.json();
 
   if (!Array.isArray(data)) return [];
-  return parseArray(data, senateTradeSchema);
+  return parseArray(data.map(normalizeSenateTradeRecord), senateTradeSchema);
 }
 
 export async function fetchSenateTradesByName(name: string): Promise<SenateTrade[]> {
@@ -96,12 +138,12 @@ export async function fetchSenateTradesByName(name: string): Promise<SenateTrade
 
 export async function fetchHouseDisclosures(page = 0): Promise<HouseDisclosure[]> {
   const apiKey = getServerEnv().FMP_API_KEY;
-  const url = `${FMP_BASE_URL}/stable/house-disclosure?page=${page}&apikey=${apiKey}`;
+  const url = `${FMP_BASE_URL}/api/v4/senate-disclosure-rss-feed?page=${page}&apikey=${apiKey}`;
   const response = await fetchWithRetry(url);
   const data: unknown = await response.json();
 
   if (!Array.isArray(data)) return [];
-  return parseArray(data, houseDisclosureSchema);
+  return parseArray(data.map(normalizeHouseDisclosureRecord), houseDisclosureSchema);
 }
 
 export async function fetchStockQuote(ticker: string): Promise<StockQuote | null> {

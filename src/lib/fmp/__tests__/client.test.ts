@@ -94,7 +94,7 @@ describe("fetchSenateTrades", () => {
     const result = await fetchSenateTrades();
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "https://financialmodelingprep.com/stable/senate-trading?page=0&apikey=test-key",
+      "https://financialmodelingprep.com/api/v4/senate-trading-rss-feed?page=0&apikey=test-key",
       expect.objectContaining({ signal: expect.any(AbortSignal) })
     );
     expect(result).toHaveLength(1);
@@ -107,9 +107,19 @@ describe("fetchSenateTrades", () => {
     await fetchSenateTrades(3);
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "https://financialmodelingprep.com/stable/senate-trading?page=3&apikey=test-key",
+      "https://financialmodelingprep.com/api/v4/senate-trading-rss-feed?page=3&apikey=test-key",
       expect.anything()
     );
+  });
+
+  it("maps symbol into ticker for rss feed responses", async () => {
+    mockFetch.mockReturnValueOnce(
+      jsonResponse([{ ...validSenateTrade, ticker: undefined, symbol: "AAPL" }])
+    );
+
+    const result = await fetchSenateTrades();
+
+    expect(result[0]?.ticker).toBe("AAPL");
   });
 
   it("filters out invalid records", async () => {
@@ -157,7 +167,7 @@ describe("fetchHouseDisclosures", () => {
     const result = await fetchHouseDisclosures();
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "https://financialmodelingprep.com/stable/house-disclosure?page=0&apikey=test-key",
+      "https://financialmodelingprep.com/api/v4/senate-disclosure-rss-feed?page=0&apikey=test-key",
       expect.anything()
     );
     expect(result).toHaveLength(1);
@@ -170,9 +180,34 @@ describe("fetchHouseDisclosures", () => {
     await fetchHouseDisclosures(5);
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "https://financialmodelingprep.com/stable/house-disclosure?page=5&apikey=test-key",
+      "https://financialmodelingprep.com/api/v4/senate-disclosure-rss-feed?page=5&apikey=test-key",
       expect.anything()
     );
+  });
+
+  it("maps representative into first and last names for house rss feed responses", async () => {
+    mockFetch.mockReturnValueOnce(
+      jsonResponse([
+        {
+          transactionDate: "2024-02-20",
+          ticker: "GOOGL",
+          assetDescription: "Alphabet Inc",
+          type: "Sale",
+          amount: "$15,001 - $50,000",
+          representative: "Jane Smith",
+          link: "https://example.com",
+        },
+      ])
+    );
+
+    const result = await fetchHouseDisclosures();
+
+    expect(result[0]).toMatchObject({
+      firstName: "Jane",
+      lastName: "Smith",
+      office: "Jane Smith",
+      ticker: "GOOGL",
+    });
   });
 });
 
