@@ -138,7 +138,7 @@ export async function fetchSenateTradesByName(name: string): Promise<SenateTrade
 
 export async function fetchHouseDisclosures(page = 0): Promise<HouseDisclosure[]> {
   const apiKey = getServerEnv().FMP_API_KEY;
-  const url = `${FMP_BASE_URL}/api/v4/house-disclosure-rss-feed?page=${page}&apikey=${apiKey}`;
+  const url = `${FMP_BASE_URL}/stable/house-latest?page=${page}&limit=100&apikey=${apiKey}`;
   const response = await fetchWithRetry(url);
   const data: unknown = await response.json();
 
