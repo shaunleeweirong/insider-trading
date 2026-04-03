@@ -3,7 +3,10 @@ import { withRateLimit } from '@/lib/middleware/rate-limit'
 
 async function handleGet(request: Request) {
   const { searchParams } = new URL(request.url)
-  const q = searchParams.get('q')?.trim() ?? ''
+  const q =
+    searchParams.get('q')?.trim() ??
+    searchParams.get('search')?.trim() ??
+    ''
   const chamber = searchParams.get('chamber')
   const party = searchParams.get('party')
   const sort = searchParams.get('sort') === 'alphabetical' ? 'alphabetical' : 'most-trades'

@@ -12,6 +12,11 @@ async function handleGet(request: Request) {
   const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit') ?? '25') || 25))
   const page = Math.max(1, Number(searchParams.get('page') ?? '1') || 1)
   const offset = (page - 1) * limit
+  const politician =
+    searchParams.get('politician')?.trim() ??
+    searchParams.get('search')?.trim() ??
+    searchParams.get('q')?.trim() ??
+    ''
 
   const supabase = await createClient()
   const {
@@ -41,6 +46,10 @@ async function handleGet(request: Request) {
 
   if (!isPremium) {
     query = query.gte('transaction_date', getFreeWindowStart())
+  }
+
+  if (politician) {
+    query = query.ilike('politicians.full_name', `%${politician}%`)
   }
 
   const { data, count, error } = await query.range(offset, offset + limit - 1)
