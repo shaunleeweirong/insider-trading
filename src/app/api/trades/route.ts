@@ -38,7 +38,7 @@ async function handleGet(request: Request) {
   let query = supabase
     .from('trades')
     .select(
-      'id, transaction_date, disclosure_date, ticker, asset_name, transaction_type, amount_range_raw, politicians(id, full_name, party, chamber)',
+      'id, transaction_date, disclosure_date, ticker, asset_name, transaction_type, amount_range_raw, politicians!inner(id, full_name, party, chamber)',
       { count: 'exact' },
     )
     .order('disclosure_date', { ascending: false, nullsFirst: false })
