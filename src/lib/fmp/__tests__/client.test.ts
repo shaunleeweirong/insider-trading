@@ -167,7 +167,7 @@ describe("fetchHouseDisclosures", () => {
     const result = await fetchHouseDisclosures();
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "https://financialmodelingprep.com/api/v4/senate-disclosure-rss-feed?page=0&apikey=test-key",
+      "https://financialmodelingprep.com/api/v4/house-disclosure-rss-feed?page=0&apikey=test-key",
       expect.anything()
     );
     expect(result).toHaveLength(1);
@@ -180,7 +180,7 @@ describe("fetchHouseDisclosures", () => {
     await fetchHouseDisclosures(5);
 
     expect(mockFetch).toHaveBeenCalledWith(
-      "https://financialmodelingprep.com/api/v4/senate-disclosure-rss-feed?page=5&apikey=test-key",
+      "https://financialmodelingprep.com/api/v4/house-disclosure-rss-feed?page=5&apikey=test-key",
       expect.anything()
     );
   });
