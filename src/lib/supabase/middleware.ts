@@ -9,6 +9,7 @@ export const PUBLIC_ROUTES = [
   '/signup',
   '/forgot-password',
   '/pricing',
+  '/auth/callback',
   '/api/trades',
   '/api/politicians',
 ]
