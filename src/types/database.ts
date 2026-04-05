@@ -101,3 +101,18 @@ export type StockPrice = {
   close_price: number
   created_at: string
 }
+
+export type PoliticianReturn = {
+  id: string
+  politician_id: string
+  time_window: 'ytd' | 'l12m' | 'l5y'
+  total_return_pct: number | null
+  deployed_capital: number | null
+  current_value: number | null
+  total_trades: number
+  open_positions: number
+  closed_positions: number
+  unresolvable_tickers: number
+  computed_at: string
+  created_at: string
+}

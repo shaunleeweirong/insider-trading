@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/sync-trades",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/compute-returns",
+      "schedule": "0 2 1 * *"
     }
   ],
   "headers": [

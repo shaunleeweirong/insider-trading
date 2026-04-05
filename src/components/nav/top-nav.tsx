@@ -11,6 +11,7 @@ type TopNavProps = {
 const links = [
   { href: '/dashboard', label: 'Trades' },
   { href: '/politicians', label: 'Politicians' },
+  { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/pricing', label: 'Pricing' },
 ]
 
